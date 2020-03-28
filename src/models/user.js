@@ -10,10 +10,11 @@ const UserSchema = new Schema({
   muta_public_key: String,
   n_likes: Number,
   n_comments: Number,
-  n_tokens: Number
+  n_tokens: Number,
+  d_tokens: Number,
 }, {
-    timestamps: true,
-  });
+  timestamps: true,
+});
 
 // Model
 const User = mongoose.model('User', UserSchema);
