@@ -42,14 +42,10 @@ app.use((req, res, next) => {
 /**
  * Error Handler.
  */
-if (process.env.NODE_ENV === 'development') {
-  // only use in development
-  app.use(errorHandler());
-} else {
-  app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(500).send('Server Error');
-  });
-}
+app.use(errorHandler());
+/* app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).send('Server Error');
+});*/
 
 module.exports = app;
