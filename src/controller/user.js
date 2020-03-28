@@ -4,14 +4,19 @@ const muta = require('../blockchains/muta');
 const client = muta.client;
 
 async function getUserTokens(address) {
-  var response = await client.queryServiceDyn({
+  var request = {
     caller: address,
     method: 'get_balance',
     payload: '',
-    serviceName: 'Mulimuli',
-  });
-  cnosole.log(response);
-  return response;
+    serviceName: 'mulimuli',
+  };
+  console.log(request);
+  var response = await client.queryServiceDyn(request);
+  console.log(response);
+  if(response.isError) {
+    return 0;
+  }
+  return response.ret.balance;
 }
 
 async function getUser(name) {
@@ -21,8 +26,8 @@ async function getUser(name) {
     for (var i = 0; i < items.length; i++) {
       if(items[i].name == name) {
         items[i].error = 0;
-        // var tokens = await getUserTokens(items[i].address);
-        // items[i].n_tokens = tokens;
+        var tokens = await getUserTokens(items[i].muta_address);
+        items[i].n_tokens = tokens;
         console.log("Found user: " + name)
         console.log(items[i]);
         return items[i];
@@ -41,14 +46,13 @@ async function getUser(name) {
  * Profile page.
  */
 exports.getAccount = function (req, res, next) {
-  console.log(req.session);
   if(req.session.logged_in) {
-    User.find({name: req.session.logged_in}).then(async function (items) {
+    User.find({name: req.session.logged_in.name}).then(async function (items) {
       console.log(items);
       for (var i = 0; i < items.length; i++) {
-        if(items[i].name == req.session.logged_in) {
-          // var tokens = await getUserTokens(items[i].address);
-          // items[i].n_tokens = tokens;
+        if(items[i].name == req.session.logged_in.name) {
+          var tokens = await getUserTokens(items[i].muta_address);
+          items[i].n_tokens = tokens;
           res.json({
             error: 0,
             data: items[i]
@@ -74,7 +78,17 @@ exports.getAccount = function (req, res, next) {
 exports.getUser = getUser;
 
 exports.createUser = function(req, res, next) {
-  account = muta.generateAccount();
+  if(req.query.secret_key) {
+    var mutaAccount = muta.getAccount(req.query.secret_key);
+    account = {
+      privateKey: req.query.secret_key,
+      address: mutaAccount.address,
+      publicKey: mutaAccount.publicKey
+    };
+  } else {
+    account = muta.generateAccount();
+  }
+  console.log(account);
   user = {
     "name": req.query.name,
     "avatar": "assets/avatar.jpg",

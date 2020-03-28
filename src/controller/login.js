@@ -21,16 +21,19 @@ exports.login = async (req, res, next) => {
 	}
 
 	var user = await User.getUser(req.body.user_id);
-	console.log(user);
 	if(!user) {
 		res.json({"error": 1, "msg": "Invalid user id"});
 		return;
 	}
 
-	console.log(user);
+	if(user.muta_address != req.body.address) {
+		res.json({"error": 1, "msg": "Address mismatch!"});
+		console.log("Expected address: " + user.muta_address);
+		console.log("Sent address: " + req.body.address);
+		return;
+	}
 
-	req.session.logged_in = user.name;
-	console.log(req.session);
+	req.session.logged_in = user;
 
 	// TODO: verify signature with associated public key
 	res.json({
