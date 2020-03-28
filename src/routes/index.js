@@ -22,4 +22,7 @@ router.post('/star', postsRouter.starPost);
 router.post('/cash-in', udtRouter.cashIn);
 router.post('/cash-out', udtRouter.cashOut);
 
+router.post('/stake-in', udtRouter.stakeIn);
+router.post('/stake-out', udtRouter.stakeOut);
+
 module.exports = router;

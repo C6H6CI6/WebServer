@@ -1,5 +1,6 @@
 const { User } = require('../models/User');
 const muta = require('../blockchains/muta');
+const ckb = require('../blockchains/ckb');
 
 const client = muta.client;
 
@@ -80,27 +81,29 @@ exports.getUser = getUser;
 exports.createUser = function(req, res, next) {
   if(req.query.secret_key) {
     var mutaAccount = muta.getAccount(req.query.secret_key);
-    account = {
+    muta_account = {
       privateKey: req.query.secret_key,
       address: mutaAccount.address,
       publicKey: mutaAccount.publicKey
     };
   } else {
-    account = muta.generateAccount();
+    muta_account = muta.generateAccount();
   }
-  console.log(account);
+  var ckb_account = ckb.createAccount();
+  console.log(muta_account);
+  console.log(ckb_account);
   user = {
     "name": req.query.name,
     "avatar": "assets/avatar.jpg",
-    "ckb_address": "0x0000",
-    "muta_address": account.address,
-    "muta_public_key": account.publicKey,
+    "ckb_address": ckb_account.address,
+    "ckb_public_key": ckb_account.publicKey,
+    "muta_address": muta_account.address,
+    "muta_public_key": muta_account.publicKey,
     "n_likes": 0,
     "n_comments": 0,
     "n_tokens": 0
   };
   console.log(user);
-  console.log(account);
   User.create(user);
   res.json({
     error: 0

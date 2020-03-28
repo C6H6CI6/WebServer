@@ -5,6 +5,7 @@ const UserSchema = new Schema({
   name: String,
   avatar: String,
   ckb_address: String,
+  ckb_public_key: String,
   muta_address: String,
   muta_public_key: String,
   n_likes: Number,

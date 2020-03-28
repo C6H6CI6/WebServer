@@ -8,7 +8,7 @@ exports.getNewPosts = (req, res, next) => {
 	Posts.find().then(item => {
 		item.sort((a, b) => {
 			return a.updatedAt < b.updatedAt ? 1 : (a.updatedAt > b.updatedAt ? -1 : 0);
-		})
+		});
 		postsResponse = item;
 		res.json({
 			error: 0,
