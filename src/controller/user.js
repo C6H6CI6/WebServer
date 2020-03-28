@@ -1,4 +1,4 @@
-const { User } = require('../models/User');
+const { User } = require('../models/user');
 const muta = require('../blockchains/muta');
 const ckb = require('../blockchains/ckb');
 
