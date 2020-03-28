@@ -22,7 +22,7 @@ exports.cashIn = function (req, res, next) {
 			})
 		} else {
 			cmd = "ckb-cli --wait-for-sync --url http://47.56.237.128:4114 cross-chain charge --amount " +
-				req.body.amount + " --muta-address " + account.address;
+				req.body.amount + " --muta-address " + req.session.logged_in.muta_address; // account.address;
 			console.log(cmd);
 			exec(cmd, function(err, stdout1, stderr1) {
 					if(err) {
@@ -94,7 +94,7 @@ exports.cashOut = function (req, res, next) {
 	);
 
 	cmd = "ckb-cli --wait-for-sync --url http://47.56.237.128:4114 cross-chain withdraw --amount " +
-		req.body.amount + " --muta-address " + account.address;
+		req.body.amount + " --muta-address " + req.session.logged_in.muta_address; // account.address;
 
 	console.log(cmd);
 	exec(cmd, function(err, stdout, stderr) {
