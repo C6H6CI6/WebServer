@@ -3,7 +3,13 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
   name: String,
-  email: String,
+  avatar: String,
+  ckb_address: String,
+  muta_address: String,
+  muta_public_key: String,
+  n_likes: Number,
+  n_comments: Number,
+  n_tokens: Number
 }, {
     timestamps: true,
   });

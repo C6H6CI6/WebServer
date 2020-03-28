@@ -1,20 +1,94 @@
 const { User } = require('../models/User');
+const muta = require('../blockchains/muta');
+
+const client = muta.client;
+
+async function getUserTokens(address) {
+  var response = await client.queryServiceDyn({
+    caller: address,
+    method: 'get_balance',
+    payload: '',
+    serviceName: 'Mulimuli',
+  });
+  cnosole.log(response);
+  return response;
+}
+
+async function getUser(name) {
+  try {
+    var items = await User.find({name: name});
+    console.log(items);
+    for (var i = 0; i < items.length; i++) {
+      if(items[i].name == name) {
+        items[i].error = 0;
+        // var tokens = await getUserTokens(items[i].address);
+        // items[i].n_tokens = tokens;
+        console.log("Found user: " + name)
+        console.log(items[i]);
+        return items[i];
+      }
+    }
+    console.log("User " + name + " Not found");
+    return;
+  } catch (error) {
+    console.log(error);
+    return;
+  }
+}
+
 /**
  * GET /account
  * Profile page.
  */
-exports.getAccount = (req, res, next) => {
-  User.find().then(item => {
-    if (item !== null) {
-      res.render('index',
-      {
-        title: 'Express',
-        item
-      });
-    }
-  })
-  .catch ((error) => {
-    res.status(500).send('Internal Server Error');
-  });
-  
+exports.getAccount = function (req, res, next) {
+  console.log(req.session);
+  if(req.session.logged_in) {
+    User.find({name: req.session.logged_in}).then(async function (items) {
+      console.log(items);
+      for (var i = 0; i < items.length; i++) {
+        if(items[i].name == req.session.logged_in) {
+          // var tokens = await getUserTokens(items[i].address);
+          // items[i].n_tokens = tokens;
+          res.json({
+            error: 0,
+            data: items[i]
+          });
+          return;
+        }
+      }
+      res.json({
+        error: 1,
+        msg: "User name not found"
+      })
+    })
+    .catch ((error) => {
+      console.log("Error in rendering users!\n" + error);
+      res.status(500).send('Internal Server Error');
+    });
+  } else {
+    res.json({"error": 1});
+  }
+
 };
+
+exports.getUser = getUser;
+
+exports.createUser = function(req, res, next) {
+  account = muta.generateAccount();
+  user = {
+    "name": req.query.name,
+    "avatar": "assets/avatar.jpg",
+    "ckb_address": "0x0000",
+    "muta_address": account.address,
+    "muta_public_key": account.publicKey,
+    "n_likes": 0,
+    "n_comments": 0,
+    "n_tokens": 0
+  };
+  console.log(user);
+  console.log(account);
+  User.create(user);
+  res.json({
+    error: 0
+  });
+}

@@ -62,4 +62,4 @@ typings/
 .cache/
 dist/
 bin/
-public/
+# public/
